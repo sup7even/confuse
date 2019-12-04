@@ -1,0 +1,42 @@
+TCA:
+  Types:
+    check:
+      exclude: boolean
+      label: string
+      config:
+        type: check
+        cols: integer
+        renderType:
+          - checkboxToggle
+          - checkboxLabeledToggle
+        default: integer
+        eval:
+          - maximumRecordsChecked
+          - maximumRecordsCheckedInPid
+        items: array
+        itemsProcFunc: string
+        readOnly: boolean
+
+    flex:
+
+    group:
+
+    imageManipulation:
+
+    inline:
+
+    input:
+
+    none:
+
+    passthrough:
+
+    radio:
+
+    select:
+
+    slug:
+
+    text:
+
+    user:

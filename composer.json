@@ -1,0 +1,26 @@
+{
+	"name": "supseven/confuse",
+	"type": "typo3-cms-extension",
+	"description": "A TYPO3 Configuration Array Usage",
+	"homepage": "https://www.supseven.at",
+	"version": "1.0.0",
+	"license": "GPL-3.0-or-later",
+	"require": {
+		"typo3/cms-core": " ^9.5 || ^10",
+		"php": ">=7.2"
+	},
+	"autoload": {
+		"psr-4": {
+			"Supseven\\Confuse\\": "Classes"
+		}
+	},
+	"replace": {
+		"confuse": "self.version"
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "confuse"
+		},
+		"installer-name": "confuse"
+	}
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<xliff version="1.0">
+    <file source-language="en" date="2019-11-04T07:17:55+01:00">
+        <body>
+            <trans-unit id="check.label">
+                <source>Checkbox</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
