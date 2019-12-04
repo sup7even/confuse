@@ -1,7 +1,7 @@
 {
 	"name": "supseven/confuse",
 	"type": "typo3-cms-extension",
-	"description": "A TYPO3 Configuration Array Usage",
+	"description": "a (maybe) smarter way to write your TCA",
 	"homepage": "https://www.supseven.at",
 	"version": "1.0.0",
 	"license": "GPL-3.0-or-later",
