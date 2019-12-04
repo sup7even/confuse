@@ -14,9 +14,6 @@
 			"Supseven\\Confuse\\": "Classes"
 		}
 	},
-	"replace": {
-		"confuse": "self.version"
-	},
 	"extra": {
 		"typo3/cms": {
 			"extension-key": "confuse"
