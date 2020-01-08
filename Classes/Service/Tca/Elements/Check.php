@@ -37,13 +37,8 @@ class Check extends Element
      */
     public function build(): Element
     {
-        $this->element[$this->name] = [
-            'foo' => 'bar',
-        ];
-
-        $this->customElementConfig = [
-            'bar' => 'foo'
-        ];
+        $this->element[$this->name] = [];
+        $this->customElementConfig = [];
 
         return parent::build();
     }
@@ -56,7 +51,7 @@ class Check extends Element
     public function setValue($items): self
     {
         if ($this->checkConfig('items', $items)) {
-            $this->elementConfig['items'] = $items;
+            $this->elementConfig['items'] = $this->setItemsForValue($items);
         } else {
             throw new \Exception('Value for Checkbox is not an Array or an empty Array', 1575378425);
         }
@@ -125,5 +120,33 @@ class Check extends Element
         }
 
         return $this;
+    }
+
+    /**
+     * returns the items in a correct key/value pair as TYPO3 expects it
+     *
+     * @param $items
+     * @return array
+     */
+    private function setItemsForValue($items): array
+    {
+        foreach($items as &$item) {
+            if (!is_array($item)) {
+                $item = [
+                    0 => $item,
+                    1 => $item
+                ];
+            }
+
+            if (count($item) !== 2) {
+                $item = [
+                    0 => $item[0],
+                    1 => array_pop($item),
+                ];
+            }
+
+        }
+
+        return $items;
     }
 }
