@@ -1,8 +1,15 @@
 TCA:
   Types:
-    check:
+    default:
+      description: string
+      displayCond: string|array
       exclude: boolean
       label: string
+      l10n_display: string
+      l10n_mode: string
+      onChange: string
+
+    check:
       config:
         type: check
         cols: integer

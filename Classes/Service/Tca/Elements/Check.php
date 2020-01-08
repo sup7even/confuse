@@ -19,6 +19,9 @@ class Check extends Element
     /** @var string eval method */
     public const EVAL_maximumRecordsCheckedInPid = 'maximumRecordsCheckedInPid';
 
+    /** @var int the default value */
+    public $default = 0;
+
     /**
      * @return static
      */

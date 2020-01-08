@@ -19,11 +19,8 @@ abstract class Element implements ElementInterface
     /** @var string the element name */
     protected $name;
 
-    /** @var bool the element exclude setting */
-    protected $exclude;
-
-    /** @var string the element label */
-    protected $label;
+    /** @var array the default settings based on the yaml config file */
+    protected $defaultSettings = [];
 
     /** @var mixed the element default */
     protected $default;
@@ -53,6 +50,14 @@ abstract class Element implements ElementInterface
     }
 
     /**
+     * @return array
+     */
+    public function getYamlConfig(): array
+    {
+        return $this->yamlFileloader->load(self::YAML_FILE)['TCA']['Types'];
+    }
+
+    /**
      * @return $this
      * @throws \Exception
      */
@@ -62,15 +67,19 @@ abstract class Element implements ElementInterface
             throw new \Exception('No Build method in Element Class ' . ucfirst($this->type));
         }
 
+        // load default settings from yaml file with magic method __call()
+        ArrayUtility::mergeRecursiveWithOverrule($this->element, [
+            $this->name => $this->defaultSettings
+        ]);
+
+        // merge settings from abstraction
         ArrayUtility::mergeRecursiveWithOverrule($this->element, [
             $this->name => [
-                'exclude' => $this->exclude,
-                'label'   => $this->label ?: LocalizationUtility::translate($this->type . '.label', 'confuse'),
                 'config'  => $this->getElementConfig(),
             ]
         ]);
 
-        // possible custom overrides
+        // merge custom settings from abstraction
         ArrayUtility::mergeRecursiveWithOverrule($this->element[$this->name], $this->customElementConfig);
 
         return $this;
@@ -85,6 +94,43 @@ abstract class Element implements ElementInterface
     }
 
     /**
+     * @param $key string The Config Keyname
+     * @param $type string The TypeCast Type
+     * @param $value string the Value to TypeCast
+     * @return bool
+     */
+    public function checkConfig($key, $value): bool
+    {
+        if (isset($this->yamlConfig[$this->type][$key]) && $this->yamlConfig[$this->type][$key] === gettype($value)) {
+            return true;
+        }
+
+        if (isset($this->yamlConfig[$this->type]['config'][$key]) && $this->yamlConfig[$this->type]['config'][$key] === gettype($value)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function getElementConfig()
+    {
+        ArrayUtility::mergeRecursiveWithOverrule($this->elementConfig, [
+            'type'    => $this->type,
+            'default' => $this->default,
+        ]);
+
+        // remove nullable entries
+        $this->elementConfig = array_filter($this->elementConfig, function ($value) {
+            return !is_null($value) && $value !== '';
+        });
+
+        return $this->elementConfig;
+    }
+
+    /**
      * @param $name string The Element Name
      * @return $this
      */
@@ -96,26 +142,39 @@ abstract class Element implements ElementInterface
     }
 
     /**
-     * @param $exclude bool the Element Exclude Setting
+     * the magic method to call stuff based on the yaml config file
+     *
+     * @param $method
+     * @param $arguments
      * @return $this
      */
-    public function setExclude($exclude): self
+    public function __call($method, $arguments)
     {
-        if ($this->checkConfig('exclude', $exclude)) {
-            $this->exclude = $exclude;
+        $defaultKey = strtolower(str_replace('set', '', $method));
+
+        if (array_key_exists($defaultKey, $this->yamlConfig['default'])) {
+            $value = array_shift($arguments);
+            $type = $this->yamlConfig['default'][$defaultKey];
+
+            if (gettype($value) === $type) {
+                $this->defaultSettings[$defaultKey] = $value;
+            }
         }
 
         return $this;
     }
 
     /**
-     * @param $label string the Element Label
+     * @param $value
      * @return $this
+     * @throws \Exception
      */
-    public function setLabel($label): self
+    public function setValue($value)
     {
-        if ($this->checkConfig('label', $label)) {
-            $this->label = $label;
+        if ($this->checkConfig('value', $value)) {
+            $this->elementConfig['value'] = $value;
+        } else {
+            throw new \Exception('Value for Element is not as described in the YAML Config', 1578487613);
         }
 
         return $this;
@@ -152,50 +211,5 @@ abstract class Element implements ElementInterface
         }
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getYamlConfig(): array
-    {
-        return $this->yamlFileloader->load(self::YAML_FILE)['TCA']['Types'];
-    }
-
-    /**
-     * @param $key string The Config Keyname
-     * @param $type string The TypeCast Type
-     * @param $value string the Value to TypeCast
-     * @return bool
-     */
-    protected function checkConfig($key, $value): bool
-    {
-        if (isset($this->yamlConfig[$this->type][$key]) && $this->yamlConfig[$this->type][$key] === gettype($value)) {
-            return true;
-        }
-
-        if (isset($this->yamlConfig[$this->type]['config'][$key]) && $this->yamlConfig[$this->type]['config'][$key] === gettype($value)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return array
-     */
-    private function getElementConfig()
-    {
-        ArrayUtility::mergeRecursiveWithOverrule($this->elementConfig, [
-            'type'    => $this->type,
-            'default' => $this->default,
-        ]);
-
-        // remove nullable entries
-        $this->elementConfig = array_filter($this->elementConfig, function ($value) {
-            return !is_null($value) && $value !== '';
-        });
-
-        return $this->elementConfig;
     }
 }
