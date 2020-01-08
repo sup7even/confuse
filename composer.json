@@ -3,7 +3,6 @@
 	"type": "typo3-cms-extension",
 	"description": "a (maybe) smarter way to write your TCA",
 	"homepage": "https://www.supseven.at",
-	"version": "1.0.0",
 	"license": "GPL-3.0-or-later",
 	"require": {
 		"typo3/cms-core": " ^9.5 || ^10",
